@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-require('dotenv').config()
+require('dotenv').config();
 require('../configEnv').config();
 var app = require('../app');
 var debug = require('debug')(process.env.APPLICATION_NAME);

@@ -1,14 +1,16 @@
 {
-  "name": "reminder-api",
-  "title": "Reminder Api",
+  "name": "products-service",
+  "title": "Products Service",
   "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "nodemon ./bin/www | bunyan",
-    "start": "npm run db:init && node ./bin/www | bunyan",
-    "db:init": "node db/init.js"
+    "start": "node ./bin/www | bunyan",
+    "db:init": "node db/init.js",
+    "db:load": "node db/load-data.js"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "bunyan": "^1.8.12",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
