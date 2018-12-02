@@ -30,6 +30,20 @@ class ProductsRepository {
         });
     }
 
+    async getProduct(productId) {
+        const query = {
+            name: 'get-product-by-id',
+            text: `SELECT * FROM products
+                    WHERE id = $1`,
+            values: [productId]
+        };
+        const result = await this.executeQuery(query)
+        if (result.rowCount !== 1) {
+            throw new Error("NOT_FOUND::Resource not found");
+        }
+        return this.toProduct(result.rows[0]);
+    }
+
     async purchaseProduct({ userId, productId}) {
         const query = {
             name: 'insert-user-products',

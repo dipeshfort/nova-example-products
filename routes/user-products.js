@@ -3,6 +3,7 @@ const router = express.Router();
 const logger = require('../utils/logger');
 const repository = require('../repository/products.repository');
 const axios = require('axios');
+const invoiceService = require('../services/invoice.service');
 
 router.use((req, res, next) => {
     if (req.method === 'OPTIONS') {
@@ -23,7 +24,10 @@ router.use((req, res, next) => {
         }
     }).then((resp) => {
         if (resp.data && resp.data.id) {
-            res.locals.user = resp.data;
+            res.locals.user = {
+                ...resp.data,
+                token: authorization.replace('Bearer ', '')
+            };
             next();
         }
     }).catch((err) => {
@@ -46,19 +50,43 @@ router.get('/', async (req, res) => {
 
 router.get('/purchase', async (req, res) => {
     const productId = req.query.product_id;
-    const userId = res.locals.user.id;
-
+    const user = res.locals.user;
+    const userId = user.id;
+    
     try {
-        const result = await repository.purchaseProduct({userId, productId});
+        const product = await repository.getProduct(productId);
+        const result = await repository.purchaseProduct({userId, productId: product.id});
         logger.debug("Product purchased", JSON.stringify({
             userId,
-            productId,
-        }))
-        res.json(result);
+            product,
+        }));
+
+        const dueDate = new Date();
+        dueDate.setTime(dueDate.getTime() + (7 * 24 * 60 * 60 * 1000));
+        const invoice = {
+            userId: userId,
+            title: product.title,
+            comments: "Purchase",
+            amount: product.price,
+            remindDate: dueDate.toISOString(),
+        };
+
+        
+        const createInvoiceResult = await invoiceService.createInvoice(user.token, invoice);
+        logger.debug("Invoice created", JSON.stringify({
+            userId,
+            createInvoiceResult,
+        }));
+
+        res.json({
+            succcess: true,
+        });
     } catch (err) {
         error500(err, res);
     }
 });
+
+
 
 
 function error500(err, res) {
