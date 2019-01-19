@@ -7,7 +7,8 @@
     "dev": "nodemon ./bin/www | bunyan",
     "start": "node ./bin/www | bunyan",
     "db:init": "node db/init.js",
-    "db:load": "node db/load-data.js"
+    "db:load": "node db/load-data.js",
+    "db:startlocal": "docker run --rm --name products-db -d -p 5432:5432 -e POSTGRES_USER=nova-master -e POSTGRES_PASSWORD=nova-master -e POSTGRES_DB=products -v /Users/yadavdip/postgresqldata/products:/var/lib/postgresql/data postgres:9.6.11"
   },
   "dependencies": {
     "axios": "^0.18.0",
